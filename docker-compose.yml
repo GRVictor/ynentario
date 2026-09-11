@@ -1,0 +1,64 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ynentario_app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    networks:
+      - ynentario_net
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=ynentario
+      - DB_USERNAME=ynentario_user
+      - DB_PASSWORD=ynentario_secret
+
+  web:
+    image: nginx:alpine
+    container_name: ynentario_web
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - app
+    networks:
+      - ynentario_net
+
+  db:
+    image: mysql:8.0
+    container_name: ynentario_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ynentario
+      MYSQL_USER: ynentario_user
+      MYSQL_PASSWORD: ynentario_secret
+      MYSQL_ROOT_PASSWORD: root_secret_password
+    ports:
+      - "33060:3306"
+    volumes:
+      - ynentario_mysql_data:/var/lib/mysql
+    networks:
+      - ynentario_net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "ynentario_user", "-pynentario_secret"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+networks:
+  ynentario_net:
+    driver: bridge
+
+volumes:
+  ynentario_mysql_data:
+    driver: local
