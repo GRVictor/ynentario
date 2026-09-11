@@ -2,7 +2,7 @@
 
 Sistema de gestión y control de inventarios multialmacén con trazabilidad completa de movimientos, Kardex físico y control de existencias en tiempo real.
 
-Desarrollado con **Laravel 13**, **Vue 3** (Composition API, `<script setup>`), **Inertia.js**, **TypeScript** y **Tailwind CSS**.
+Desarrollado con **Laravel 13**, **Vue 3**, **Inertia.js**, **TypeScript** y **Tailwind CSS**.
 
 ---
 
